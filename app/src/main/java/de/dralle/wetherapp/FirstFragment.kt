@@ -13,7 +13,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -61,7 +60,6 @@ class FirstFragment : Fragment(), IUpdateListener {
         btnZip.setOnClickListener(
             View.OnClickListener {
                 callByZipCode()
-                findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
             })
         btnGPS.setOnClickListener(
             View.OnClickListener {
@@ -112,7 +110,7 @@ class FirstFragment : Fragment(), IUpdateListener {
     }
 
     private fun callByCityName() {
-        var countryCode = getCountyCode()
+        var countryCode = getCountryCode()
         var cityName = getCityName()
         Log.d(tag, "Country code is $countryCode");
         Log.d(tag, "City name is $cityName");
@@ -207,7 +205,7 @@ class FirstFragment : Fragment(), IUpdateListener {
         return view?.findViewById<TextView>(R.id.editTextCity)?.text.toString();
     }
 
-    private fun getCountyCode(): String {
+    private fun getCountryCode(): String {
         return view?.findViewById<TextView>(R.id.editTextCountryCode)?.text.toString();
     }
 }
