@@ -1,0 +1,54 @@
+<resources>
+    <string name="app_name">WetherApp</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+    <string name="search_by_gps">Search by GPS</string>
+    <string name="search_by_city">Search by city name</string>
+    <string name="search_by_zip">Search by zip code</string>
+
+    <string name="gps_input">GPS</string>
+    <string name="city_input">City</string>
+    <string name="zip_input">Zip code</string>
+    <string name="country_code_input">Your country code</string>
+
+    <string name="api_key_key">appid</string>
+    <string name="language_value">en</string>
+    <string name="language_key">lang</string>
+    <string name="units_value">metric</string>
+    <string name="units_key">units</string>
+
+    <string name="api_call_city">http://api.openweathermap.org/data/2.5/weather?q=%1$s,%2$s</string>
+    <string name="api_call_zip">http://api.openweathermap.org/data/2.5/weather?zip=%1$s,%2$s</string>
+    <string name="api_call_gps">http://api.openweathermap.org/data/2.5/weather?lat=%1$s&amp;lon=%2$s</string>
+
+    <!-- API response keys -->
+    <!-- Show data UI screen strings -->
+    <string name="header_line">Current weather in %1$s</string>
+    <string name="cur_temperature">Temperature: %1$s %2$s</string>
+    <string name="feels_temperature">Feels like: %1$s %2$s</string>
+    <string name="pressure">Air pressure: %1$s hPa</string>
+    <string name="overview">Current weather situation: %1$s</string>
+    <string name="humidity">Humidity: %1$s %%</string>
+    <string name="min_temperature">Low: %1$s %2$s</string>
+    <string name="max_temperature">High: %1$s %2$s</string>
+    <string name="wind_speed">Wind speed: %1$s %2$s</string>
+    <string name="heading">Wind direction: %1$s degrees</string>
+    <string name="wind_gusts">Wind gusts: %1$s %2$s</string>
+    <string name="timestamp">Data from: %1$s (local)</string>
+    <string name="sunrise">Sunrise: %1$s (local)</string>
+    <string name="sunset">Sunset: %1$s (local)</string>
+
+    <string name="unit_temperature_metric">°C</string>
+    <string name="unit_speed_metric">meters/second</string>
+
+    <string name="unit_temperature_imperial">°F</string>
+    <string name="unit_speed_imperial">miles/hour</string>
+</resources>
