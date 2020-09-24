@@ -15,6 +15,8 @@
     <string name="search_by_zip">Search by zip code</string>
 
     <string name="gps_input">GPS</string>
+    <string name="lat_gps_input">lat</string>
+    <string name="lon_gps_input">lon</string>
     <string name="city_input">City</string>
     <string name="zip_input">Zip code</string>
     <string name="country_code_input">Your country code</string>
