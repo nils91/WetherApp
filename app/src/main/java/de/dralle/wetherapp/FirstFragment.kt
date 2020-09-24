@@ -106,7 +106,44 @@ class FirstFragment : Fragment(), IUpdateListener {
     }
 
     private fun callByZipCode() {
-        TODO("Not yet implemented")
+        var countryCode = getCountryCode()
+        val zipCode = getZipCode()
+        Log.d(tag, "Country code is $countryCode");
+        Log.d(tag, "Zip code is $zipCode");
+        var urlString = resources.getString(R.string.api_call_zip)
+        Log.d(tag, "Loaded api url $urlString")
+        urlString = String.format(
+            urlString,
+            URLEncoder.encode(zipCode, "UTF-8"),
+            URLEncoder.encode(countryCode, "UTF-8")
+        )
+        var additonalParams = getParams()
+        var additionalParamsString = getParamString(additonalParams)
+        urlString += additionalParamsString
+        Log.i(tag, "Parameterized api url $urlString")
+        GlobalScope.launch {
+            var result: String? = null;
+            try {
+                result = doApiCall(urlString)
+            } catch (e: Exception) {
+                Log.e(tag, "API call failed ${e.message}")
+                val message = "API call failed: ${e.message}"
+                activity?.runOnUiThread {
+                    val duration = Toast.LENGTH_LONG
+                    val toast = Toast.makeText(context, message, duration)
+                    toast.show()
+                }
+
+            }
+            if (result != null) {
+                val resultObject = JSONObject(result)
+                shared?.apiResponseObject = resultObject
+
+                activity?.runOnUiThread {
+                    findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+                }
+            }
+        }
     }
 
     private fun callByCityName() {
@@ -132,7 +169,7 @@ class FirstFragment : Fragment(), IUpdateListener {
             } catch (e: Exception) {
                 Log.e(tag, "API call failed ${e.message}")
                 val message = "API call failed: ${e.message}"
-                activity?.runOnUiThread{
+                activity?.runOnUiThread {
                     val duration = Toast.LENGTH_LONG
                     val toast = Toast.makeText(context, message, duration)
                     toast.show()
@@ -187,18 +224,22 @@ class FirstFragment : Fragment(), IUpdateListener {
     }
 
     private fun getParams(): Map<String, String> {
-        var prefs=PreferenceManager.getDefaultSharedPreferences(activity);
+        var prefs = PreferenceManager.getDefaultSharedPreferences(activity);
         var params: MutableMap<String, String>
-        var apiKey=prefs.getString("api_key",null)
-        Log.d(tag,"API key is $apiKey")
+        var apiKey = prefs.getString("api_key", null)
+        Log.d(tag, "API key is $apiKey")
         params = HashMap<String, String>()
-        if(apiKey!=null){
+        if (apiKey != null) {
             params[resources.getString(R.string.api_key_key)] = apiKey
         }
         params[resources.getString(R.string.language_key)] =
             resources.getString(R.string.language_value)
         params[resources.getString(R.string.units_key)] = resources.getString(R.string.units_value)
         return params
+    }
+
+    private fun getZipCode(): String {
+        return view?.findViewById<TextView>(R.id.editTextZip)?.text.toString()
     }
 
     private fun getCityName(): String {
