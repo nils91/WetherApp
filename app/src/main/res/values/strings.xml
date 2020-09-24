@@ -25,6 +25,7 @@
     <string name="units_value">metric</string>
     <string name="units_key">units</string>
 
+    <!-- API call urls-->
     <string name="api_call_city">http://api.openweathermap.org/data/2.5/weather?q=%1$s,%2$s</string>
     <string name="api_call_zip">http://api.openweathermap.org/data/2.5/weather?zip=%1$s,%2$s</string>
     <string name="api_call_gps">http://api.openweathermap.org/data/2.5/weather?lat=%1$s&amp;lon=%2$s</string>
