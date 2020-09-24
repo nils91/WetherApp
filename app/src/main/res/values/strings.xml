@@ -11,6 +11,7 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 
     <string name="search_by_gps">Search by GPS</string>
+    <string name="get_gps_coord">Get GPS coordinates</string>
     <string name="search_by_city">Search by city name</string>
     <string name="search_by_zip">Search by zip code</string>
 

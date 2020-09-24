@@ -43,34 +43,34 @@
         app:layout_constraintTop_toBottomOf="@+id/editTextCity" />
 
     <Button
-        android:id="@+id/btnCity"
+        android:id="@+id/btnSearchCity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="20dp"
         android:text="@string/search_by_city"
         app:layout_constraintStart_toEndOf="@+id/editTextCity"
         app:layout_constraintTop_toBottomOf="@+id/editTextCountryCode" />
 
     <Button
-        android:id="@+id/btnZip"
+        android:id="@+id/btnSearchZip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="11dp"
         android:layout_marginTop="11dp"
         android:text="@string/search_by_zip"
         app:layout_constraintStart_toEndOf="@+id/editTextZip"
-        app:layout_constraintTop_toBottomOf="@+id/btnCity" />
+        app:layout_constraintTop_toBottomOf="@+id/btnSearchCity" />
 
     <Button
-        android:id="@+id/btnGPS"
+        android:id="@+id/btnSearchGPS"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"
         android:text="@string/search_by_gps"
         app:layout_constraintStart_toEndOf="@+id/editTextLongitude"
-        app:layout_constraintTop_toBottomOf="@+id/btnZip" />
+        app:layout_constraintTop_toBottomOf="@+id/btnLocate" />
 
     <EditText
         android:id="@+id/editTextLatitude"
@@ -95,4 +95,14 @@
         android:inputType="textPersonName"
         app:layout_constraintStart_toEndOf="@+id/editTextLatitude"
         app:layout_constraintTop_toBottomOf="@+id/editTextZip" />
+
+    <Button
+        android:id="@+id/btnLocate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/get_gps_coord"
+        app:layout_constraintStart_toEndOf="@+id/editTextLongitude"
+        app:layout_constraintTop_toBottomOf="@+id/btnSearchZip" />
 </androidx.constraintlayout.widget.ConstraintLayout>

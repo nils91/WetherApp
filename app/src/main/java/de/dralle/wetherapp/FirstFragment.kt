@@ -49,9 +49,9 @@ class FirstFragment : Fragment(), IUpdateListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        var btnCity = view.findViewById<Button>(R.id.btnCity)
-        var btnZip = view.findViewById<Button>(R.id.btnZip)
-        var btnGPS = view.findViewById<Button>(R.id.btnGPS)
+        var btnCity = view.findViewById<Button>(R.id.btnSearchCity)
+        var btnZip = view.findViewById<Button>(R.id.btnSearchZip)
+        var btnGPS = view.findViewById<Button>(R.id.btnSearchGPS)
 
         btnCity.setOnClickListener(
             View.OnClickListener {
