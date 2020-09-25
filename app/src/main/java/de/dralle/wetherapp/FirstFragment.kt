@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
@@ -76,7 +77,8 @@ class FirstFragment : Fragment(), IUpdateListener {
     }
 
     private fun locateAndWriteGPS() {
-        TODO("Not yet implemented")
+        val etFieldLat=view?.findViewById<EditText>(R.id.editTextLatitude);
+        val etFieldLon=view?.findViewById<EditText>(R.id.editTextLongitude);
     }
 
     override fun onAttach(context: Context) {
