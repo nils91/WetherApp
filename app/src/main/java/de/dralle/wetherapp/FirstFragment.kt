@@ -12,6 +12,9 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.PermissionChecker
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import kotlinx.coroutines.GlobalScope
@@ -22,6 +25,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
+import java.security.Permission
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -53,7 +57,7 @@ class FirstFragment : Fragment(), IUpdateListener {
         val btnCity = view.findViewById<Button>(R.id.btnSearchCity)
         val btnZip = view.findViewById<Button>(R.id.btnSearchZip)
         val btnGPS = view.findViewById<Button>(R.id.btnSearchGPS)
-        val btnLocate=view.findViewById<Button>(R.id.btnLocate)
+        val btnLocate = view.findViewById<Button>(R.id.btnLocate)
 
         btnCity.setOnClickListener(
             View.OnClickListener {
@@ -77,8 +81,8 @@ class FirstFragment : Fragment(), IUpdateListener {
     }
 
     private fun locateAndWriteGPS() {
-        val etFieldLat=view?.findViewById<EditText>(R.id.editTextLatitude);
-        val etFieldLon=view?.findViewById<EditText>(R.id.editTextLongitude);
+        val etFieldLat = view?.findViewById<EditText>(R.id.editTextLatitude);
+        val etFieldLon = view?.findViewById<EditText>(R.id.editTextLongitude);
     }
 
     override fun onAttach(context: Context) {
@@ -157,42 +161,57 @@ class FirstFragment : Fragment(), IUpdateListener {
     }
 
     private fun callByCityName() {
-        var countryCode = getCountryCode()
-        var cityName = getCityName()
-        Log.d(tag, "Country code is $countryCode");
-        Log.d(tag, "City name is $cityName");
-        var urlString = resources.getString(R.string.api_call_city)
-        Log.d(tag, "Loaded api url $urlString")
-        urlString = String.format(
-            urlString,
-            URLEncoder.encode(cityName, "UTF-8"),
-            URLEncoder.encode(countryCode, "UTF-8")
-        )
-        var additonalParams = getParams()
-        var additionalParamsString = getParamString(additonalParams)
-        urlString += additionalParamsString
-        Log.i(tag, "Parameterized api url $urlString")
-        GlobalScope.launch {
-            var result: String? = null;
-            try {
-                result = doApiCall(urlString)
-            } catch (e: Exception) {
-                Log.e(tag, "API call failed ${e.message}")
-                val message = "API call failed: ${e.message}"
-                activity?.runOnUiThread {
-                    val duration = Toast.LENGTH_LONG
-                    val toast = Toast.makeText(context, message, duration)
-                    toast.show()
-                }
+        if (ContextCompat.checkSelfPermission(
+                context!!,
+                "android.permission.INTERNET"
+            ) == PermissionChecker.PERMISSION_GRANTED
+        ) {
+            var countryCode = getCountryCode()
+            var cityName = getCityName()
+            Log.d(tag, "Country code is $countryCode");
+            Log.d(tag, "City name is $cityName");
+            var urlString = resources.getString(R.string.api_call_city)
+            Log.d(tag, "Loaded api url $urlString")
+            urlString = String.format(
+                urlString,
+                URLEncoder.encode(cityName, "UTF-8"),
+                URLEncoder.encode(countryCode, "UTF-8")
+            )
+            var additonalParams = getParams()
+            var additionalParamsString = getParamString(additonalParams)
+            urlString += additionalParamsString
+            Log.i(tag, "Parameterized api url $urlString")
+            GlobalScope.launch {
+                var result: String? = null;
+                try {
+                    result = doApiCall(urlString)
+                } catch (e: Exception) {
+                    Log.e(tag, "API call failed ${e.message}")
+                    val message = "API call failed: ${e.message}"
+                    activity?.runOnUiThread {
+                        val duration = Toast.LENGTH_LONG
+                        val toast = Toast.makeText(context, message, duration)
+                        toast.show()
+                    }
 
+                }
+                if (result != null) {
+                    val resultObject = JSONObject(result)
+                    shared?.apiResponseObject = resultObject
+
+                    activity?.runOnUiThread {
+                        findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+                    }
+                }
             }
-            if (result != null) {
-                val resultObject = JSONObject(result)
-                shared?.apiResponseObject = resultObject
-
-                activity?.runOnUiThread {
-                    findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
-                }
+        } else {
+            Log.d(tag,"Internet access permission not granted")
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    activity!!,
+                    "android.permission.INTERNET"
+                )
+            ) {
+                Toast.makeText(activity,"No internet access permission",Toast.LENGTH_LONG).show()
             }
         }
     }

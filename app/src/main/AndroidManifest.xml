@@ -22,6 +22,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- Recommended for Android 9 (API level 28) and lower. -->
+        <!-- Required for Android 10 (API level 29) and higher. -->
+        <service
+            android:name=".WetherAppLocationService"
+            android:foregroundServiceType="location"
+            tools:ignore="MissingClass">
+        <!-- Any inner elements would go here. -->
+        </service>
     </application>
 
 </manifest>
