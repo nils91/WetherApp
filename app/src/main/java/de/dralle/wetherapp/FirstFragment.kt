@@ -49,9 +49,10 @@ class FirstFragment : Fragment(), IUpdateListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        var btnCity = view.findViewById<Button>(R.id.btnSearchCity)
-        var btnZip = view.findViewById<Button>(R.id.btnSearchZip)
-        var btnGPS = view.findViewById<Button>(R.id.btnSearchGPS)
+        val btnCity = view.findViewById<Button>(R.id.btnSearchCity)
+        val btnZip = view.findViewById<Button>(R.id.btnSearchZip)
+        val btnGPS = view.findViewById<Button>(R.id.btnSearchGPS)
+        val btnLocate=view.findViewById<Button>(R.id.btnLocate)
 
         btnCity.setOnClickListener(
             View.OnClickListener {
@@ -66,9 +67,16 @@ class FirstFragment : Fragment(), IUpdateListener {
                 callByGPS()
                 findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
             })
+        btnLocate.setOnClickListener {
+            locateAndWriteGPS()
+        }
         Log.i(tag, "test")
         val isDebugLoggable = Log.isLoggable(tag, Log.DEBUG)
         Log.e(tag, "Debug is loggable: $isDebugLoggable")
+    }
+
+    private fun locateAndWriteGPS() {
+        TODO("Not yet implemented")
     }
 
     override fun onAttach(context: Context) {
