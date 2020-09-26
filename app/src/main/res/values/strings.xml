@@ -57,4 +57,5 @@
     <string name="unit_speed_imperial">miles/hour</string>
     <string name="need_gps_reason">The function you´re trying to use needs access to location services</string>
     <string name="need_gps_title">Location</string>
+    <string name="gps_dialog_ok">OK</string>
 </resources>
