@@ -1,7 +1,10 @@
 package de.dralle.wetherapp
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -17,6 +20,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -36,8 +45,10 @@ class FirstFragment : Fragment(), IUpdateListener {
         fun onApiCallResult()
     }
 
+    private val PERMISSION_FINE_LOCATION_REQUEST_CODE: Int=42
     private var callback: OnAPICallResultListener? = null
     private var shared: SharedDataContainer? = null
+    private var fusedLocationProvide:FusedLocationProviderClient?=null
 
     fun setOnApiCallResultListener(listener: OnAPICallResultListener) {
         callback = listener
@@ -53,6 +64,8 @@ class FirstFragment : Fragment(), IUpdateListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        fusedLocationProvide= context?.let { LocationServices.getFusedLocationProviderClient(it) }
 
         val btnCity = view.findViewById<Button>(R.id.btnSearchCity)
         val btnZip = view.findViewById<Button>(R.id.btnSearchZip)
@@ -70,7 +83,6 @@ class FirstFragment : Fragment(), IUpdateListener {
         btnGPS.setOnClickListener(
             View.OnClickListener {
                 callByGPS()
-                findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
             })
         btnLocate.setOnClickListener {
             locateAndWriteGPS()
@@ -78,19 +90,67 @@ class FirstFragment : Fragment(), IUpdateListener {
         Log.i(tag, "test")
         val isDebugLoggable = Log.isLoggable(tag, Log.DEBUG)
         Log.e(tag, "Debug is loggable: $isDebugLoggable")
-        val dialog=MessageDialogFragment()
-        if(fragmentManager!=null){
-            dialog.show(fragmentManager!!,tag)
-        }
+
     }
 
     private fun locateAndWriteGPS() {
-        if(ContextCompat.checkSelfPermission(activity!!,"android.permission.ACCESS_FINE_LOCATION")==PermissionChecker.PERMISSION_GRANTED){
-            val etFieldLat = view?.findViewById<EditText>(R.id.editTextLatitude);
-            val etFieldLon = view?.findViewById<EditText>(R.id.editTextLongitude);
-        }else{
-            if(ActivityCompat.shouldShowRequestPermissionRationale(activity!!,"android.permission.ACCESS_FINE_LOCATION")){
-                
+        if (ContextCompat.checkSelfPermission(
+                activity!!,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PermissionChecker.PERMISSION_GRANTED
+        ){
+            val locTask:Task<Location>?=fusedLocationProvide?.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY,null)
+            locTask?.addOnCompleteListener(activity!!, OnCompleteListener {
+                Log.d(tag,"Location request completed")
+                val loc=it.result
+                if(loc!=null){
+                    Log.d(tag,"Latitude: ${loc.latitude} Longitude: ${loc.longitude}")
+                }else{
+                    Log.w(tag,"No exact location found")
+                }
+                if(loc!=null){
+                activity?.runOnUiThread {
+                    writeLocationToUI(loc)
+                }}
+
+            })
+
+        } else {
+            if (shouldShowRequestPermissionRationale(
+                    android.Manifest.permission.ACCESS_FINE_LOCATION
+                )
+            ) {
+                val dialog = MessageDialogFragment()
+                if (fragmentManager != null) {
+                    dialog.show(fragmentManager!!, tag)
+                } else {
+                    Log.w(tag, "Cant show dialog")
+                }
+            }
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),PERMISSION_FINE_LOCATION_REQUEST_CODE)
+        }
+    }
+
+    private fun writeLocationToUI(loc: Location) {
+        val etFieldLat = view?.findViewById<EditText>(R.id.editTextLatitude);
+        val etFieldLon = view?.findViewById<EditText>(R.id.editTextLongitude);
+        etFieldLat?.setText(loc.latitude.toString(),TextView.BufferType.EDITABLE)
+        etFieldLon?.setText(loc.longitude.toString(),TextView.BufferType.EDITABLE)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when(requestCode){
+            PERMISSION_FINE_LOCATION_REQUEST_CODE ->{
+                if(grantResults.isNotEmpty()&&grantResults[0]==PackageManager.PERMISSION_GRANTED){
+                    Log.d(tag, "Access to location granted")
+                }else{
+                    Log.e(tag, "Access to location not granted")
+                }
             }
         }
     }
@@ -126,7 +186,7 @@ class FirstFragment : Fragment(), IUpdateListener {
     }
 
     private fun callByGPS() {
-        TODO("Not yet implemented")
+
     }
 
     private fun callByZipCode() {
@@ -145,7 +205,7 @@ class FirstFragment : Fragment(), IUpdateListener {
         var additionalParamsString = getParamString(additonalParams)
         urlString += additionalParamsString
         Log.i(tag, "Parameterized api url $urlString")
-        GlobalScope.launch {
+        GlobalScope.launch (Dispatchers.IO){
             var result: String? = null;
             try {
                 result = doApiCall(urlString)
@@ -215,8 +275,8 @@ class FirstFragment : Fragment(), IUpdateListener {
                 }
             }
         } else {
-            Log.d(tag,"Internet access permission not granted")
-                Toast.makeText(activity,"No internet access permission",Toast.LENGTH_LONG).show()
+            Log.d(tag, "Internet access permission not granted")
+            Toast.makeText(activity, "No internet access permission", Toast.LENGTH_LONG).show()
         }
     }
 
