@@ -186,7 +186,65 @@ class FirstFragment : Fragment(), IUpdateListener {
     }
 
     private fun callByGPS() {
+        if (ContextCompat.checkSelfPermission(
+                context!!,
+                Manifest.permission.INTERNET
+            ) == PermissionChecker.PERMISSION_GRANTED
+        ) {
+            val lat=getLatitudeFromUI()
+            val lon=getLongitudeFromUI()
+            //Make sure the correct decimal point is used
+            lat?.replace(',','.')
+            lon?.replace(',','.')
+            Log.d(tag, "Latitude is $lat, longitude is $lon");
+            var urlString = resources.getString(R.string.api_call_gps)
+            Log.d(tag, "Loaded api url $urlString")
+            urlString = String.format(
+                urlString,
+                URLEncoder.encode(lat, "UTF-8"),
+                URLEncoder.encode(lon, "UTF-8")
+            )
+            var additonalParams = getParams()
+            var additionalParamsString = getParamString(additonalParams)
+            urlString += additionalParamsString
+            Log.i(tag, "Parameterized api url $urlString")
+            GlobalScope.launch {
+                var result: String? = null;
+                try {
+                    result = doApiCall(urlString)
+                } catch (e: Exception) {
+                    Log.e(tag, "API call failed ${e.message}")
+                    val message = "API call failed: ${e.message}"
+                    activity?.runOnUiThread {
+                        val duration = Toast.LENGTH_LONG
+                        val toast = Toast.makeText(context, message, duration)
+                        toast.show()
+                    }
 
+                }
+                if (result != null) {
+                    val resultObject = JSONObject(result)
+                    shared?.apiResponseObject = resultObject
+
+                    activity?.runOnUiThread {
+                        findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+                    }
+                }
+            }
+        } else {
+            Log.d(tag, "Internet access permission not granted")
+            Toast.makeText(activity, "No internet access permission", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun getLongitudeFromUI():String?{
+        val etFieldLon = view?.findViewById<EditText>(R.id.editTextLongitude);
+        return etFieldLon?.text.toString()
+    }
+
+    private fun getLatitudeFromUI(): String? {
+        val etFieldLat = view?.findViewById<EditText>(R.id.editTextLatitude);
+        return etFieldLat?.text.toString()
     }
 
     private fun callByZipCode() {
@@ -233,7 +291,7 @@ class FirstFragment : Fragment(), IUpdateListener {
     private fun callByCityName() {
         if (ContextCompat.checkSelfPermission(
                 context!!,
-                "android.permission.INTERNET"
+                Manifest.permission.INTERNET
             ) == PermissionChecker.PERMISSION_GRANTED
         ) {
             var countryCode = getCountryCode()
