@@ -78,11 +78,21 @@ class FirstFragment : Fragment(), IUpdateListener {
         Log.i(tag, "test")
         val isDebugLoggable = Log.isLoggable(tag, Log.DEBUG)
         Log.e(tag, "Debug is loggable: $isDebugLoggable")
+        val dialog=MessageDialogFragment()
+        if(fragmentManager!=null){
+            dialog.show(fragmentManager!!,tag)
+        }
     }
 
     private fun locateAndWriteGPS() {
-        val etFieldLat = view?.findViewById<EditText>(R.id.editTextLatitude);
-        val etFieldLon = view?.findViewById<EditText>(R.id.editTextLongitude);
+        if(ContextCompat.checkSelfPermission(activity!!,"android.permission.ACCESS_FINE_LOCATION")==PermissionChecker.PERMISSION_GRANTED){
+            val etFieldLat = view?.findViewById<EditText>(R.id.editTextLatitude);
+            val etFieldLon = view?.findViewById<EditText>(R.id.editTextLongitude);
+        }else{
+            if(ActivityCompat.shouldShowRequestPermissionRationale(activity!!,"android.permission.ACCESS_FINE_LOCATION")){
+                
+            }
+        }
     }
 
     override fun onAttach(context: Context) {
@@ -206,13 +216,7 @@ class FirstFragment : Fragment(), IUpdateListener {
             }
         } else {
             Log.d(tag,"Internet access permission not granted")
-            if (ActivityCompat.shouldShowRequestPermissionRationale(
-                    activity!!,
-                    "android.permission.INTERNET"
-                )
-            ) {
                 Toast.makeText(activity,"No internet access permission",Toast.LENGTH_LONG).show()
-            }
         }
     }
 
