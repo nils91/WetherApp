@@ -4,26 +4,19 @@ import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import android.util.TimeUtils
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.fragment_second.*
 import org.json.JSONObject
-import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatterBuilder
 import java.util.*
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
  */
-class SecondFragment : Fragment(),IUpdateListener {
+class ResultsDisplayFragment : Fragment(),IUpdateListener {
 
     private var shared: SharedDataContainer?=null
 
@@ -54,7 +47,7 @@ class SecondFragment : Fragment(),IUpdateListener {
     }
 
     private fun wireToActivity(context: Context) {
-        if(context is MainActivity){
+        if(context is WetherAppMainActivity){
             context.addUpdatableFragment(this)
         }
     }

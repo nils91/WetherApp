@@ -15,7 +15,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import androidx.navigation.fragment.findNavController
@@ -34,12 +33,11 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-import java.security.Permission
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
-class FirstFragment : Fragment(), IUpdateListener {
+class LocationInputFragment : Fragment(), IUpdateListener {
 
     interface OnAPICallResultListener {
         fun onApiCallResult()
@@ -166,7 +164,7 @@ class FirstFragment : Fragment(), IUpdateListener {
     }
 
     private fun wireToActivity(context: Context) {
-        if (context is MainActivity) {
+        if (context is WetherAppMainActivity) {
             context.addUpdatableFragment(this)
         }
         if (context is OnAPICallResultListener) {
