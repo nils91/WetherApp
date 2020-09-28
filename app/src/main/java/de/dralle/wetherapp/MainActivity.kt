@@ -10,12 +10,15 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.iterator
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import de.dralle.wetherapp.FirstFragment.OnAPICallResultListener
 import kotlinx.android.synthetic.main.content_main.*
 
 class MainActivity : AppCompatActivity(), OnAPICallResultListener {
+
+    private var settingsActive:Boolean=false
     private var updatables :MutableSet<IUpdateListener> = HashSet<IUpdateListener>()
     private val shared:SharedDataContainer= SharedDataContainer()
 
@@ -29,7 +32,18 @@ class MainActivity : AppCompatActivity(), OnAPICallResultListener {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        val settingsMenu=menu?.findItem(R.id.action_settings)
+        settingsMenu?.isEnabled=settingsActive
         return super.onPrepareOptionsMenu(menu)
+    }
+
+    fun activateSettingsMenu(){
+        settingsActive=true
+        invalidateOptionsMenu()
+    }
+    fun deactivateSettingsMenu(){
+        settingsActive=false
+        invalidateOptionsMenu()
     }
 
     fun addUpdatableFragment(fragment:IUpdateListener){
