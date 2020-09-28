@@ -63,6 +63,11 @@ class LocationInputFragment : Fragment(), IUpdateListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // activate settings menu button
+        if(activity is WetherAppMainActivity){
+            (activity as WetherAppMainActivity).activateSettingsMenu()
+        }
+
         fusedLocationProvide= context?.let { LocationServices.getFusedLocationProviderClient(it) }
 
         val btnCity = view.findViewById<Button>(R.id.btnSearchCity)

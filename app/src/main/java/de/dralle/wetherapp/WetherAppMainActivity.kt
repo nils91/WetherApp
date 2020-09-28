@@ -31,7 +31,7 @@ class WetherAppMainActivity : AppCompatActivity(), OnAPICallResultListener {
         return super.onPrepareOptionsMenu(menu)
     }
 
-    fun activateSettingsMenu(){
+    public fun activateSettingsMenu(){
         settingsActive=true
         invalidateOptionsMenu()
     }
