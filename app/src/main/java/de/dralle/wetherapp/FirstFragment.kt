@@ -112,9 +112,7 @@ class FirstFragment : Fragment(), IUpdateListener {
                 activity?.runOnUiThread {
                     writeLocationToUI(loc)
                 }}
-
             })
-
         } else {
             if (shouldShowRequestPermissionRationale(
                     android.Manifest.permission.ACCESS_FINE_LOCATION
