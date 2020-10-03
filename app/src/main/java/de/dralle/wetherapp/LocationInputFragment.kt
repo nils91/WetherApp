@@ -20,6 +20,7 @@ import androidx.core.content.PermissionChecker
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.OnCompleteListener
@@ -102,6 +103,10 @@ class LocationInputFragment : Fragment(), IUpdateListener {
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) == PermissionChecker.PERMISSION_GRANTED
         ){
+            val locAvail:Task<LocationAvailability>? = fusedLocationProvide?.locationAvailability
+            locAvail?.addOnCompleteListener {
+                Log.d(tag,"Location availability: ${it.result}")
+            }
             val locTask:Task<Location>?=fusedLocationProvide?.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY,null)
             locTask?.addOnCompleteListener(activity!!, OnCompleteListener {
                 Log.d(tag,"Location request completed")
