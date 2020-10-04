@@ -3,10 +3,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <EditTextPreference
-        android:defaultValue="Enter API Key"
         android:key="api_key"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:title="API key" />
+        android:title="@string/api_key_pref" />
+    <EditTextPreference
+        android:key="country_code"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/country_code_pref" />
+    <EditTextPreference
+        android:key="language_code"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/language_code_pref" />
+    <EditTextPreference
+        android:key="units"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/units_pref" />
 
 </PreferenceScreen>

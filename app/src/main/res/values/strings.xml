@@ -22,6 +22,12 @@
     <string name="zip_input">Zip code</string>
     <string name="country_code_input">Your country code</string>
 
+    <!-- prefs -->
+    <string name="api_key_pref">Openweather API key</string>
+    <string name="country_code_pref">Your country code</string>
+    <string name="language_code_pref">Language code</string>
+    <string name="units_pref">Preferred units</string>
+
     <string name="api_key_key">appid</string>
     <string name="language_value">en</string>
     <string name="language_key">lang</string>
