@@ -1,6 +1,7 @@
 package de.dralle.wetherapp
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
@@ -94,7 +95,7 @@ class LocationInputFragment : Fragment(), IUpdateListener {
                 callByGPS()
             })
         btnLocate?.setOnClickListener {
-            locateAndWriteGPS()
+            //locateAndWriteGPS()
             //Send user to enable location services
             val locationIntent =
                 Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
@@ -102,70 +103,68 @@ class LocationInputFragment : Fragment(), IUpdateListener {
         }
         btnCurLoc?.setOnClickListener {
             //check permission for location
-            if (ContextCompat.checkSelfPermission(
-                    activity!!,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) == PermissionChecker.PERMISSION_GRANTED
-            ) {
-
-            } else {
-                //check if should show message
-                if (shouldShowRequestPermissionRationale(
-                        android.Manifest.permission.ACCESS_FINE_LOCATION
-                    )
-                ) {
-                    Log.d(tag, "Trying to showing location dialog")
-                    if (context != null) {
-                        val dialogBuilder: AlertDialog.Builder = AlertDialog.Builder(context!!)
-                        dialogBuilder.setTitle(R.string.need_gps_title)
-                        dialogBuilder.setMessage(R.string.need_gps_reason)
-                        dialogBuilder.setPositiveButton(
-                            R.string.gps_dialog_ok,
-                            DialogInterface.OnClickListener { dialog, id ->
-                                Log.d(tag, "Location dialog: OK")
-                                //Request permission
-                                requestPermissions(
-                                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                                    PERMISSION_FINE_LOCATION_REQUEST_CODE
-                                )
-
-                            })
-                        dialogBuilder.setNegativeButton(
-                            R.string.gps_dialog_cancel,
-                            DialogInterface.OnClickListener { dialog, id ->
-                                Log.d(
-                                    tag,
-                                    "Location dialog: Cancel (Btn)"
-                                )
-                            })
-                        dialogBuilder.setOnCancelListener {
-                            Log.d(
-                                tag,
-                                "Location dialog: Cancel (cancel)"
-                            )
-                        }
-                        dialogBuilder.setOnDismissListener {
-                            Log.d(
-                                tag,
-                                "Location dialog: Cancel (dismiss)"
-                            )
-                        }
-                    } else {
-                        Log.w(tag, "Unable to show location dialog due to context being $context")
-                    }
-                } else {
-                    Log.d(tag, "Not showing location dialog")
-                    //Request permission
-                    requestPermissions(
-                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                        PERMISSION_FINE_LOCATION_REQUEST_CODE
-                    )
-                }
-            }
+            handleCallAPIWithCurrentLocation()
         }
         Log.d(tag, "Location input fragment: onViewCreated finished")
 
 
+    }
+
+    private fun handleCallAPIWithCurrentLocation() {
+        if (ContextCompat.checkSelfPermission(
+                activity!!,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PermissionChecker.PERMISSION_GRANTED
+        ) {
+            handleLocationAvailabilityRequest()
+        } else {
+            //check if should show message
+            if (shouldShowRequestPermissionRationale(
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+            ) {
+                Log.d(tag, "Trying to showing location dialog")
+                if (context != null) {
+                    val dialogBuilder: AlertDialog.Builder = AlertDialog.Builder(context!!)
+                    dialogBuilder.setTitle(R.string.need_gps_title)
+                    dialogBuilder.setMessage(R.string.need_gps_reason)
+                    dialogBuilder.setPositiveButton(
+                        R.string.gps_dialog_ok,
+                        DialogInterface.OnClickListener { dialog, id ->
+                            Log.d(tag, "Location dialog: OK")
+                            //Request permission
+                            requestLocationPermission()
+
+                        })
+                    dialogBuilder.setNegativeButton(
+                        R.string.gps_dialog_cancel,
+                        DialogInterface.OnClickListener { dialog, id ->
+                            Log.d(
+                                tag,
+                                "Location dialog: Cancel (Btn)"
+                            )
+                        })
+                    dialogBuilder.setOnCancelListener {
+                        Log.d(
+                            tag,
+                            "Location dialog: Cancel (cancel)"
+                        )
+                    }
+                    dialogBuilder.setOnDismissListener {
+                        Log.d(
+                            tag,
+                            "Location dialog: Cancel (dismiss)"
+                        )
+                    }
+                } else {
+                    Log.w(tag, "Unable to show location dialog due to context being $context")
+                }
+            } else {
+                Log.d(tag, "Not showing location dialog")
+                //Request permission
+                requestLocationPermission()
+            }
+        }
     }
 
     private fun locateAndWriteGPS() {
@@ -208,11 +207,19 @@ class LocationInputFragment : Fragment(), IUpdateListener {
                     Log.w(tag, "Cant show dialog")
                 }
             }
-            requestPermissions(
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                PERMISSION_FINE_LOCATION_REQUEST_CODE
-            )
+            requestLocationPermission()
         }
+    }
+
+    /**
+     * Request permission for fine location. Check onRequestPermissionsResult for result. Request code is PERMISSION_FINE_LOCATION_REQUEST_CODE
+     */
+    private fun requestLocationPermission() {
+        Log.d(tag,"Request permission for fine location")
+        requestPermissions(
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+            PERMISSION_FINE_LOCATION_REQUEST_CODE
+        )
     }
 
     private fun writeLocationToUI(loc: Location) {
@@ -230,170 +237,221 @@ class LocationInputFragment : Fragment(), IUpdateListener {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             PERMISSION_FINE_LOCATION_REQUEST_CODE -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d(tag, "Access to location granted")
-                    if (ContextCompat.checkSelfPermission(
-                            context!!,
-                            Manifest.permission.ACCESS_FINE_LOCATION
-                        ) == PermissionChecker.PERMISSION_GRANTED
-                    ) {
-                        if (fusedLocationProvider != null) {
-                            val locAvail: Task<LocationAvailability>? =
-                                fusedLocationProvider?.locationAvailability
-                            locAvail?.addOnCompleteListener {
-                                val locAvail = it.result
-                                Log.d(tag, "Location availability: $locAvail")
-                                if (locAvail.isLocationAvailable) {
-                                    Log.d(tag, "Location services available")
-                                } else {
-                                    Log.d(tag, "Location services not available")
-                                    Log.d(tag, "Trying to showing location services dialog")
-                                    if (context != null) {
-                                        val dialogBuilder: AlertDialog.Builder =
-                                            AlertDialog.Builder(
-                                                context!!
-                                            )
-                                        dialogBuilder.setTitle(R.string.need_gps_title)
-                                        dialogBuilder.setMessage(R.string.need_gps_reason)
-                                        dialogBuilder.setPositiveButton(
-                                            R.string.gps_dialog_ok,
-                                            DialogInterface.OnClickListener { dialog, id ->
-                                                Log.d(tag, "Location services dialog: OK")
-                                                //Send user to enable location services
-                                                val locationIntent =
-                                                    Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-                                                startActivityForResult(locationIntent,LOCATION_INTENT_REQUEST_CODE)
-                                            })
-                                        dialogBuilder.setNegativeButton(
-                                            R.string.gps_dialog_cancel,
-                                            DialogInterface.OnClickListener { dialog, id ->
-                                                Log.d(
-                                                    tag,
-                                                    "Location services dialog: Cancel (Btn)"
-                                                )
-                                            })
-                                        dialogBuilder.setOnCancelListener {
-                                            Log.d(
-                                                tag,
-                                                "Location services dialog: Cancel (cancel)"
-                                            )
-                                        }
-                                        dialogBuilder.setOnDismissListener {
-                                            Log.d(
-                                                tag,
-                                                "Location services dialog: Cancel (dismiss)"
-                                            )
-                                        }
-                                    } else {
-                                        Log.w(
-                                            tag,
-                                            "Unable to show location services dialog due to context being $context"
-                                        )
-                                    }
-                                }
-                            }
-                        } else {
-                            Log.w(tag, "No fused locationProvider")
-                        }
-                    } else {
-                        Log.w(tag, "No location permission")
-                    }
-                } else {
-                    Log.w(tag, "Access to location not granted")
+                if(grantResults.isNotEmpty()){
+                    handleLocationPermissionRequestResult(grantResults[0])
+                }else{
+                    Log.e(tag,"No location permission grant results")
                 }
             }
         }
+    }
+
+    private fun handleLocationPermissionRequestResult(grantResult: Int) {
+        if (grantResult == PackageManager.PERMISSION_GRANTED) {
+            handleLocationPermissionGranted()
+        } else {
+            Log.w(tag, "Access to location not granted")
+        }
+    }
+
+    private fun handleLocationPermissionGranted() {
+        Log.d(tag, "Access to location granted")
+        if (ContextCompat.checkSelfPermission( //Permission check needed for fusedLocationProvider not to complain
+                context!!,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PermissionChecker.PERMISSION_GRANTED
+        ) {
+            if (fusedLocationProvider != null) {
+                handleLocationAvailabilityRequest()
+            } else {
+                Log.w(tag, "No fused locationProvider")
+            }
+        } else {
+            Log.w(tag, "No location permission (This message should never be displayed here)")
+        }
+    }
+
+    /**
+     * Check if location services are enabled, and if yes, proceed with currentLocationRequest. Assumes location permission be granted.
+     */
+    @SuppressLint("MissingPermission")
+    private fun handleLocationAvailabilityRequest() {
+        val locAvail: Task<LocationAvailability>? =
+            fusedLocationProvider?.locationAvailability
+        locAvail?.addOnCompleteListener {
+            val locAvail = it.result
+            Log.d(tag, "Location availability: $locAvail")
+            if (locAvail.isLocationAvailable) {
+                Log.d(tag, "Location services available")
+                handleCurrentLocationRequest()
+            } else {
+                Log.d(tag, "Location services not available")
+                Log.d(tag, "Trying to showing location services dialog")
+                if (context != null) {
+                    val dialogBuilder: AlertDialog.Builder =
+                        AlertDialog.Builder(
+                            context!!
+                        )
+                    dialogBuilder.setTitle(R.string.need_ls_title)
+                    dialogBuilder.setMessage(R.string.need_ls_reason)
+                    dialogBuilder.setPositiveButton(
+                        R.string.gps_dialog_ok,
+                        DialogInterface.OnClickListener { dialog, id ->
+                            Log.d(tag, "Location services dialog: OK")
+                            requestUserEnableLocationServices()
+                        })
+                    dialogBuilder.setNegativeButton(
+                        R.string.gps_dialog_cancel,
+                        DialogInterface.OnClickListener { dialog, id ->
+                            Log.d(
+                                tag,
+                                "Location services dialog: Cancel (Btn)"
+                            )
+                        })
+                    dialogBuilder.setOnCancelListener {
+                        Log.d(
+                            tag,
+                            "Location services dialog: Cancel (cancel)"
+                        )
+                    }
+                    dialogBuilder.setOnDismissListener {
+                        Log.d(
+                            tag,
+                            "Location services dialog: Cancel (dismiss)"
+                        )
+                    }
+                } else {
+                    Log.w(
+                        tag,
+                        "Unable to show location services dialog due to context being $context"
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Send an intent to open location settings so hat the user can enable location services. Check onActivityResult for Results. RequestCode is LOCATION_INTENT_REQUEST_CODE
+     */
+    private fun requestUserEnableLocationServices() {
+        //Send user to enable location services
+        val locationIntent =
+            Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+        startActivityForResult(locationIntent, LOCATION_INTENT_REQUEST_CODE)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.d(tag,"Intent finished. Request code: $requestCode Result code: $resultCode Intent: $data")
         if(requestCode == LOCATION_INTENT_REQUEST_CODE){
-            Log.d(tag,"Location Intent finished")
-            if (ContextCompat.checkSelfPermission(
-                    activity!!,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) == PermissionChecker.PERMISSION_GRANTED
-            ) {
-                val locAvail: Task<LocationAvailability>? = fusedLocationProvider?.locationAvailability
-                locAvail?.addOnCompleteListener { locationAvailabiltyResult ->
-                    val locAvail = locationAvailabiltyResult.result
-                    Log.d(tag, "Location availability: $locAvail")
-                    if (locAvail.isLocationAvailable) {
-                        Log.d(tag, "Location services available")
-                        //Request location
-                        val locTask: Task<Location>? = fusedLocationProvider?.getCurrentLocation( //TODO: add idle spinner
-                            LocationRequest.PRIORITY_HIGH_ACCURACY,
-                            null
-                        )
-                        locTask?.addOnCompleteListener(activity!!, OnCompleteListener {
-                            Log.d(tag, "Location request completed")
-                            val loc = it.result
-                            if (loc != null) {
-                                Log.d(tag, "Latitude: ${loc.latitude} Longitude: ${loc.longitude}")
-                                if (ContextCompat.checkSelfPermission(
-                                        context!!,
-                                        Manifest.permission.INTERNET
-                                    ) == PermissionChecker.PERMISSION_GRANTED
-                                ){
-                                    Log.d(tag,"Internet permission available")
-                                    val lat=loc.latitude
-                                    var lon=loc.longitude
-                                    var latString=lat.toString()
-                                    var lonString=loc.toString()
-                                    Log.d(tag, "Latitude is $lat, longitude is $lon");
-                                    Log.d(tag, "Latitude is $latString, longitude is $lonString (String(1))");
-                                    latString=latString.replace(',','.')
-                                    lonString=lonString.replace(',','.')
-                                    Log.d(tag, "Latitude is $latString, longitude is $lonString (String(2))");
-                                    var urlString = resources.getString(R.string.api_call_gps)
-                                    Log.d(tag, "Loaded api url $urlString")
-                                    urlString = String.format(
-                                        urlString,
-                                        URLEncoder.encode(latString, "UTF-8"),
-                                        URLEncoder.encode(lonString, "UTF-8")
-                                    )
-                                    Log.d(tag, "Api url with lat/lon $urlString")
-                                    var additonalParams = getParams()
-                                    var additionalParamsString = getParamString(additonalParams)
-                                    urlString += additionalParamsString
-                                    Log.d(tag, "Parameterized api url $urlString")
-                                    GlobalScope.launch (Dispatchers.IO){
-                                        var result: String? = null;
-                                        try {
-                                            result = doApiCall(urlString)
-                                        } catch (e: Exception) {
-                                            Log.e(tag, "API call failed ${e.message}")
-                                            val message = "API call failed: ${e.message}"
-                                            activity?.runOnUiThread {
-                                                val duration = Toast.LENGTH_LONG
-                                                val toast = Toast.makeText(context, message, duration)
-                                                toast.show()
-                                            }
+            handleLocationIntentFinish()
+        }
+    }
 
-                                        }
-                                        if (result != null) {
-                                            val resultObject = JSONObject(result)
-                                            shared?.apiResponseObject = resultObject
-
-                                            activity?.runOnUiThread {
-                                                findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
-                                            }
-                                        }
-                                    }
-                                }else{
-                                    Log.d(tag,"Internet permission not available")
-                                }
-                            } else {
-                                Log.w(tag, "No exact location found")
-                            }
-                        })
-                    }else{
-                        Log.d(tag,"Location services not available")
-                    }
+    private fun handleLocationIntentFinish() {
+        Log.d(tag, "Location Intent finished")
+        if (ContextCompat.checkSelfPermission(
+                activity!!,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PermissionChecker.PERMISSION_GRANTED
+        ) {
+            val locAvail: Task<LocationAvailability>? = fusedLocationProvider?.locationAvailability
+            locAvail?.addOnCompleteListener { locationAvailabiltyResult ->
+                val locAvail = locationAvailabiltyResult.result
+                Log.d(tag, "Location availability: $locAvail")
+                if (locAvail.isLocationAvailable) {
+                    handleCurrentLocationRequest()
+                } else {
+                    Log.d(tag, "Location services not available")
                 }
-            }else{
-                Log.w(tag,"No access to location")
+            }
+        } else {
+            Log.w(tag, "No access to location")
+        }
+    }
+
+    /**
+     * Request current location, handle it and send api call. Assumes location permission to be granted.
+     */
+    private fun handleCurrentLocationRequest() {
+        Log.d(tag, "Location services available")
+        //Request location
+        val locTask: Task<Location>? =
+            fusedLocationProvider?.getCurrentLocation( //TODO: add idle spinner
+                LocationRequest.PRIORITY_HIGH_ACCURACY,
+                null
+            )
+        locTask?.addOnCompleteListener(activity!!, OnCompleteListener {
+            Log.d(tag, "Location request completed")
+            val loc = it.result
+            if (loc != null) {
+                Log.d(tag, "Latitude: ${loc.latitude} Longitude: ${loc.longitude}")
+                if (ContextCompat.checkSelfPermission(
+                        context!!,
+                        Manifest.permission.INTERNET
+                    ) == PermissionChecker.PERMISSION_GRANTED
+                ) {
+                    Log.d(tag, "Internet permission available")
+                    val lat = loc.latitude
+                    var lon = loc.longitude
+                    var latString = lat.toString()
+                    var lonString = loc.toString()
+                    Log.d(tag, "Latitude is $lat, longitude is $lon");
+                    Log.d(
+                        tag,
+                        "Latitude is $latString, longitude is $lonString (String(1))"
+                    );
+                    latString = latString.replace(',', '.')
+                    lonString = lonString.replace(',', '.')
+                    Log.d(
+                        tag,
+                        "Latitude is $latString, longitude is $lonString (String(2))"
+                    );
+                    var urlString = resources.getString(R.string.api_call_gps)
+                    Log.d(tag, "Loaded api url $urlString")
+                    urlString = String.format(
+                        urlString,
+                        URLEncoder.encode(latString, "UTF-8"),
+                        URLEncoder.encode(lonString, "UTF-8")
+                    )
+                    Log.d(tag, "Api url with lat/lon $urlString")
+                    var additonalParams = getParams()
+                    var additionalParamsString = getParamString(additonalParams)
+                    urlString += additionalParamsString
+                    Log.d(tag, "Parameterized api url $urlString")
+                    GlobalScope.launch(Dispatchers.IO) {
+                        sendApiCallAndShowResult(urlString)
+                    }
+                } else {
+                    Log.d(tag, "Internet permission not available")
+                }
+            } else {
+                Log.w(tag, "No exact location found")
+            }
+        })
+    }
+
+    /**
+     * Execute the API call and navigate to result fragment on success.
+     */
+    private fun sendApiCallAndShowResult(urlString: String) {
+        var result: String? = null;
+        try {
+            result = doApiCall(urlString)
+        } catch (e: Exception) {
+            Log.e(tag, "API call failed ${e.message}")
+            val message = "API call failed: ${e.message}"
+            activity?.runOnUiThread {
+                showLongToast(message)
+            }
+
+        }
+        if (result != null) {
+            val resultObject = JSONObject(result)
+            shared?.apiResponseObject = resultObject
+
+            activity?.runOnUiThread {
+                navigateToResultFragment()
             }
         }
     }
@@ -459,9 +517,7 @@ class LocationInputFragment : Fragment(), IUpdateListener {
                     Log.e(tag, "API call failed ${e.message}")
                     val message = "API call failed: ${e.message}"
                     activity?.runOnUiThread {
-                        val duration = Toast.LENGTH_LONG
-                        val toast = Toast.makeText(context, message, duration)
-                        toast.show()
+                        showLongToast(message)
                     }
 
                 }
@@ -470,7 +526,7 @@ class LocationInputFragment : Fragment(), IUpdateListener {
                     shared?.apiResponseObject = resultObject
 
                     activity?.runOnUiThread {
-                        findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+                        navigateToResultFragment()
                     }
                 }
             }
@@ -514,9 +570,7 @@ class LocationInputFragment : Fragment(), IUpdateListener {
                 Log.e(tag, "API call failed ${e.message}")
                 val message = "API call failed: ${e.message}"
                 activity?.runOnUiThread {
-                    val duration = Toast.LENGTH_LONG
-                    val toast = Toast.makeText(context, message, duration)
-                    toast.show()
+                    showLongToast(message)
                 }
 
             }
@@ -525,7 +579,7 @@ class LocationInputFragment : Fragment(), IUpdateListener {
                 shared?.apiResponseObject = resultObject
 
                 activity?.runOnUiThread {
-                    findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+                    navigateToResultFragment()
                 }
             }
         }
@@ -560,9 +614,7 @@ class LocationInputFragment : Fragment(), IUpdateListener {
                     Log.e(tag, "API call failed ${e.message}")
                     val message = "API call failed: ${e.message}"
                     activity?.runOnUiThread {
-                        val duration = Toast.LENGTH_LONG
-                        val toast = Toast.makeText(context, message, duration)
-                        toast.show()
+                        showLongToast(message)
                     }
 
                 }
@@ -571,7 +623,7 @@ class LocationInputFragment : Fragment(), IUpdateListener {
                     shared?.apiResponseObject = resultObject
 
                     activity?.runOnUiThread {
-                        findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+                        navigateToResultFragment()
                     }
                 }
             }
@@ -581,11 +633,29 @@ class LocationInputFragment : Fragment(), IUpdateListener {
         }
     }
 
+    private fun navigateToResultFragment() {
+        findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+    }
+
+    /**
+     * Show a message in a toast (Popup). Display duration is LENGTH_LONG
+     */
+    private fun showLongToast(message: String) {
+        val duration = Toast.LENGTH_LONG
+        val toast = Toast.makeText(context, message, duration)
+        toast.show()
+    }
+
+    /**
+     * Execute API call to endpoint (GET) and return result as string if successful.
+     */
     private fun doApiCall(endpoint: String): String? {
         Log.d(tag,"Trying to call $endpoint")
         return doApiCall(URL(endpoint))
     }
-
+    /**
+     * Execute API call to endpoint (GET) and return result as string if successful.
+     */
     private fun doApiCall(endpoint: URL): String? {
         Log.d(tag,"Trying to call $endpoint")
         val conn = endpoint.openConnection()
@@ -608,6 +678,9 @@ class LocationInputFragment : Fragment(), IUpdateListener {
         return null
     }
 
+    /**
+     * Get a string of additional URL parameterse
+     */
     private fun getParamString(additonalParams: Map<String, String>): String {
         var paramString = ""
         for (param in additonalParams.entries) {
@@ -619,6 +692,9 @@ class LocationInputFragment : Fragment(), IUpdateListener {
         return paramString
     }
 
+    /**
+     * Get additional parameters for openweatherapi
+     */
     private fun getParams(): Map<String, String> {
         var prefs = PreferenceManager.getDefaultSharedPreferences(activity);
         var params: MutableMap<String, String>
@@ -634,14 +710,21 @@ class LocationInputFragment : Fragment(), IUpdateListener {
         return params
     }
 
+    /**
+     * Get zip code from UI
+     */
     private fun getZipCode(): String {
         return view?.findViewById<TextView>(R.id.editTextZip)?.text.toString()
     }
-
+    /**
+     * Get city name from UI
+     */
     private fun getCityName(): String {
         return view?.findViewById<TextView>(R.id.editTextCity)?.text.toString();
     }
-
+    /**
+     * Get country code from UI
+     */
     private fun getCountryCode(): String {
         return view?.findViewById<TextView>(R.id.editTextCountryCode)?.text.toString();
     }

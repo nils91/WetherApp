@@ -66,4 +66,6 @@
     <string name="need_gps_title">Location</string>
     <string name="gps_dialog_ok">OK</string>
     <string name="gps_dialog_cancel">Cancel</string>
+    <string name="need_ls_title">Location services</string>
+    <string name="need_ls_reason">Location services need to be enabled.</string>
 </resources>
