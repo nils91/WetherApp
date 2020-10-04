@@ -95,6 +95,10 @@ class LocationInputFragment : Fragment(), IUpdateListener {
             })
         btnLocate?.setOnClickListener {
             locateAndWriteGPS()
+            //Send user to enable location services
+            val locationIntent =
+                Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+            startActivityForResult(locationIntent,LOCATION_INTENT_REQUEST_CODE)
         }
         btnCurLoc?.setOnClickListener {
             //check permission for location
@@ -297,6 +301,47 @@ class LocationInputFragment : Fragment(), IUpdateListener {
                 } else {
                     Log.w(tag, "Access to location not granted")
                 }
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        Log.d(tag,"Intent finished. Request code: $requestCode Result code: $resultCode Intent: $data")
+        if(requestCode == LOCATION_INTENT_REQUEST_CODE){
+            Log.d(tag,"Location Intent finished")
+            if (ContextCompat.checkSelfPermission(
+                    activity!!,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PermissionChecker.PERMISSION_GRANTED
+            ) {
+                val locAvail: Task<LocationAvailability>? = fusedLocationProvider?.locationAvailability
+                locAvail?.addOnCompleteListener { locationAvailabiltyResult ->
+                    val locAvail = locationAvailabiltyResult.result
+                    Log.d(tag, "Location availability: $locAvail")
+                    if (locAvail.isLocationAvailable) {
+                        Log.d(tag, "Location services available")
+                        //Request location
+                        val locTask: Task<Location>? = fusedLocationProvider?.getCurrentLocation( //TODO: add idle spinner
+                            LocationRequest.PRIORITY_HIGH_ACCURACY,
+                            null
+                        )
+                        locTask?.addOnCompleteListener(activity!!, OnCompleteListener {
+                            Log.d(tag, "Location request completed")
+                            val loc = it.result
+                            if (loc != null) {
+                                Log.d(tag, "Latitude: ${loc.latitude} Longitude: ${loc.longitude}")
+                                //TODO: do api call
+                            } else {
+                                Log.w(tag, "No exact location found")
+                            }
+                        })
+                    }else{
+                        Log.d(tag,"Location services not available")
+                    }
+                }
+            }else{
+                Log.w(tag,"No access to location")
             }
         }
     }
