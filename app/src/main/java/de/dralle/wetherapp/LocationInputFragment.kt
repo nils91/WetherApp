@@ -331,7 +331,59 @@ class LocationInputFragment : Fragment(), IUpdateListener {
                             val loc = it.result
                             if (loc != null) {
                                 Log.d(tag, "Latitude: ${loc.latitude} Longitude: ${loc.longitude}")
-                                //TODO: do api call
+                                if (ContextCompat.checkSelfPermission(
+                                        context!!,
+                                        Manifest.permission.INTERNET
+                                    ) == PermissionChecker.PERMISSION_GRANTED
+                                ){
+                                    Log.d(tag,"Internet permission available")
+                                    val lat=loc.latitude
+                                    var lon=loc.longitude
+                                    var latString=lat.toString()
+                                    var lonString=loc.toString()
+                                    Log.d(tag, "Latitude is $lat, longitude is $lon");
+                                    Log.d(tag, "Latitude is $latString, longitude is $lonString (String(1))");
+                                    latString=latString.replace(',','.')
+                                    lonString=lonString.replace(',','.')
+                                    Log.d(tag, "Latitude is $latString, longitude is $lonString (String(2))");
+                                    var urlString = resources.getString(R.string.api_call_gps)
+                                    Log.d(tag, "Loaded api url $urlString")
+                                    urlString = String.format(
+                                        urlString,
+                                        URLEncoder.encode(latString, "UTF-8"),
+                                        URLEncoder.encode(lonString, "UTF-8")
+                                    )
+                                    Log.d(tag, "Api url with lat/lon $urlString")
+                                    var additonalParams = getParams()
+                                    var additionalParamsString = getParamString(additonalParams)
+                                    urlString += additionalParamsString
+                                    Log.d(tag, "Parameterized api url $urlString")
+                                    GlobalScope.launch (Dispatchers.IO){
+                                        var result: String? = null;
+                                        try {
+                                            result = doApiCall(urlString)
+                                        } catch (e: Exception) {
+                                            Log.e(tag, "API call failed ${e.message}")
+                                            val message = "API call failed: ${e.message}"
+                                            activity?.runOnUiThread {
+                                                val duration = Toast.LENGTH_LONG
+                                                val toast = Toast.makeText(context, message, duration)
+                                                toast.show()
+                                            }
+
+                                        }
+                                        if (result != null) {
+                                            val resultObject = JSONObject(result)
+                                            shared?.apiResponseObject = resultObject
+
+                                            activity?.runOnUiThread {
+                                                findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+                                            }
+                                        }
+                                    }
+                                }else{
+                                    Log.d(tag,"Internet permission not available")
+                                }
                             } else {
                                 Log.w(tag, "No exact location found")
                             }
@@ -530,11 +582,13 @@ class LocationInputFragment : Fragment(), IUpdateListener {
     }
 
     private fun doApiCall(endpoint: String): String? {
+        Log.d(tag,"Trying to call $endpoint")
         return doApiCall(URL(endpoint))
     }
 
     private fun doApiCall(endpoint: URL): String? {
-        var conn = endpoint.openConnection()
+        Log.d(tag,"Trying to call $endpoint")
+        val conn = endpoint.openConnection()
         if (conn is HttpURLConnection) {
             Log.d(tag, "API endpoint is http")
             conn.readTimeout = 15000
