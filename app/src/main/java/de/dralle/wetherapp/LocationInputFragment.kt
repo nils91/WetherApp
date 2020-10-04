@@ -75,21 +75,25 @@ class LocationInputFragment : Fragment(), IUpdateListener {
         val btnZip = view.findViewById<Button>(R.id.btnSearchZip)
         val btnGPS = view.findViewById<Button>(R.id.btnSearchGPS)
         val btnLocate = view.findViewById<Button>(R.id.btnLocate)
+        val btnCurLoc=view.findViewById<Button>(R.id.btnLocSeGPS)
 
-        btnCity.setOnClickListener(
+        btnCity?.setOnClickListener(
             View.OnClickListener {
                 callByCityName()
             })
-        btnZip.setOnClickListener(
+        btnZip?.setOnClickListener(
             View.OnClickListener {
                 callByZipCode()
             })
-        btnGPS.setOnClickListener(
+        btnGPS?.setOnClickListener(
             View.OnClickListener {
                 callByGPS()
             })
-        btnLocate.setOnClickListener {
+        btnLocate?.setOnClickListener {
             locateAndWriteGPS()
+        }
+        btnCurLoc?.setOnClickListener {
+
         }
         Log.i(tag, "test")
         val isDebugLoggable = Log.isLoggable(tag, Log.DEBUG)

@@ -14,6 +14,7 @@
     <string name="get_gps_coord">Get GPS coordinates</string>
     <string name="search_by_city">Search by city name</string>
     <string name="search_by_zip">Search by zip code</string>
+    <string name="get_cur_gps">Use my current GPS location</string>
 
     <string name="gps_input">GPS</string>
     <string name="lat_gps_input">lat</string>
