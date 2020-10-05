@@ -156,6 +156,7 @@ class LocationInputFragment : Fragment(), IUpdateListener {
                             "Location dialog: Cancel (dismiss)"
                         )
                     }
+                    dialogBuilder.show();
                 } else {
                     Log.w(tag, "Unable to show location dialog due to context being $context")
                 }
@@ -320,6 +321,7 @@ class LocationInputFragment : Fragment(), IUpdateListener {
                             "Location services dialog: Cancel (dismiss)"
                         )
                     }
+                    dialogBuilder.show()
                 } else {
                     Log.w(
                         tag,
