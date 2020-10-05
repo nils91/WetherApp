@@ -11,3 +11,9 @@ updates:
     schedule:
       interval: "weekly"
     target-branch: "develop"
+#update gradle
+  - package-ecosystem: "gradle" # See documentation for possible values
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    target-branch: "develop"
