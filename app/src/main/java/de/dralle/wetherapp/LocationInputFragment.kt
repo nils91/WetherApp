@@ -52,7 +52,6 @@ class LocationInputFragment : Fragment(), IUpdateListener {
     private var callback: OnAPICallResultListener? = null
     private var shared: SharedDataContainer? = null
     private var fusedLocationProvider: FusedLocationProviderClient? = null
-    private var locationSettings: SettingsClient? = null
 
     fun setOnApiCallResultListener(listener: OnAPICallResultListener) {
         callback = listener
@@ -75,7 +74,6 @@ class LocationInputFragment : Fragment(), IUpdateListener {
         }
 
         fusedLocationProvider = context?.let { LocationServices.getFusedLocationProviderClient(it) }
-        locationSettings = LocationServices.getSettingsClient(requireContext())
 
         val btnCity = view.findViewById<Button>(R.id.btnSearchCity)
         val btnZip = view.findViewById<Button>(R.id.btnSearchZip)
