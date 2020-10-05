@@ -112,7 +112,7 @@ class LocationInputFragment : Fragment(), IUpdateListener {
 
     private fun handleCallAPIWithCurrentLocation() {
         if (ContextCompat.checkSelfPermission(
-                activity!!,
+                requireActivity(),
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) == PermissionChecker.PERMISSION_GRANTED
         ) {
@@ -125,7 +125,7 @@ class LocationInputFragment : Fragment(), IUpdateListener {
             ) {
                 Log.d(tag, "Trying to showing location dialog")
                 if (context != null) {
-                    val dialogBuilder: AlertDialog.Builder = AlertDialog.Builder(context!!)
+                    val dialogBuilder: AlertDialog.Builder = AlertDialog.Builder(requireContext())
                     dialogBuilder.setTitle(R.string.need_gps_title)
                     dialogBuilder.setMessage(R.string.need_gps_reason)
                     dialogBuilder.setPositiveButton(
@@ -169,7 +169,7 @@ class LocationInputFragment : Fragment(), IUpdateListener {
 
     private fun locateAndWriteGPS() {
         if (ContextCompat.checkSelfPermission(
-                activity!!,
+                requireActivity(),
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) == PermissionChecker.PERMISSION_GRANTED
         ) {
@@ -181,7 +181,7 @@ class LocationInputFragment : Fragment(), IUpdateListener {
                 LocationRequest.PRIORITY_HIGH_ACCURACY,
                 null
             )
-            locTask?.addOnCompleteListener(activity!!, OnCompleteListener {
+            locTask?.addOnCompleteListener(requireActivity(), OnCompleteListener {
                 Log.d(tag, "Location request completed")
                 val loc = it.result
                 if (loc != null) {
@@ -202,7 +202,7 @@ class LocationInputFragment : Fragment(), IUpdateListener {
             ) {
                 val dialog = MessageDialogFragment()
                 if (fragmentManager != null) {
-                    dialog.show(fragmentManager!!, tag)
+                    dialog.show(requireFragmentManager(), tag)
                 } else {
                     Log.w(tag, "Cant show dialog")
                 }
@@ -257,7 +257,7 @@ class LocationInputFragment : Fragment(), IUpdateListener {
     private fun handleLocationPermissionGranted() {
         Log.d(tag, "Access to location granted")
         if (ContextCompat.checkSelfPermission( //Permission check needed for fusedLocationProvider not to complain
-                context!!,
+                requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) == PermissionChecker.PERMISSION_GRANTED
         ) {
@@ -290,7 +290,7 @@ class LocationInputFragment : Fragment(), IUpdateListener {
                 if (context != null) {
                     val dialogBuilder: AlertDialog.Builder =
                         AlertDialog.Builder(
-                            context!!
+                            requireContext()
                         )
                     dialogBuilder.setTitle(R.string.need_ls_title)
                     dialogBuilder.setMessage(R.string.need_ls_reason)
@@ -351,7 +351,7 @@ class LocationInputFragment : Fragment(), IUpdateListener {
     private fun handleLocationIntentFinish() {
         Log.d(tag, "Location Intent finished")
         if (ContextCompat.checkSelfPermission(
-                activity!!,
+                requireActivity(),
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) == PermissionChecker.PERMISSION_GRANTED
         ) {
@@ -381,13 +381,13 @@ class LocationInputFragment : Fragment(), IUpdateListener {
                 LocationRequest.PRIORITY_HIGH_ACCURACY,
                 null
             )
-        locTask?.addOnCompleteListener(activity!!, OnCompleteListener {
+        locTask?.addOnCompleteListener(requireActivity(), OnCompleteListener {
             Log.d(tag, "Location request completed")
             val loc = it.result
             if (loc != null) {
                 Log.d(tag, "Latitude: ${loc.latitude} Longitude: ${loc.longitude}")
                 if (ContextCompat.checkSelfPermission(
-                        context!!,
+                        requireContext(),
                         Manifest.permission.INTERNET
                     ) == PermissionChecker.PERMISSION_GRANTED
                 ) {
@@ -488,7 +488,7 @@ class LocationInputFragment : Fragment(), IUpdateListener {
 
     private fun callByGPS() {
         if (ContextCompat.checkSelfPermission(
-                context!!,
+                requireContext(),
                 Manifest.permission.INTERNET
             ) == PermissionChecker.PERMISSION_GRANTED
         ) {
@@ -587,7 +587,7 @@ class LocationInputFragment : Fragment(), IUpdateListener {
 
     private fun callByCityName() {
         if (ContextCompat.checkSelfPermission(
-                context!!,
+                requireContext(),
                 Manifest.permission.INTERNET
             ) == PermissionChecker.PERMISSION_GRANTED
         ) {

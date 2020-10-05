@@ -11,7 +11,7 @@ class MessageDialogFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         if (activity != null) {
             // Use the Builder class for convenient dialog construction
-            val builder = AlertDialog.Builder(activity!!)
+            val builder = AlertDialog.Builder(requireActivity())
             builder.setTitle(R.string.need_gps_title)
             builder.setMessage(R.string.need_gps_reason)
             builder.setNeutralButton(
