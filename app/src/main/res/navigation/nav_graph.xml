@@ -9,7 +9,7 @@
         android:id="@+id/FirstFragment"
         android:name="de.dralle.wetherapp.LocationInputFragment"
         android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first">
+        tools:layout="@layout/location_input_fragment">
 
         <action
             android:id="@+id/action_FirstFragment_to_SecondFragment"
@@ -22,7 +22,7 @@
         android:id="@+id/SecondFragment"
         android:name="de.dralle.wetherapp.ResultsDisplayFragment"
         android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
+        tools:layout="@layout/show_results_fragment">
 
         <action
             android:id="@+id/action_SecondFragment_to_FirstFragment"

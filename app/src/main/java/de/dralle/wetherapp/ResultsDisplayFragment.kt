@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.fragment_second.*
+import kotlinx.android.synthetic.main.show_results_fragment.*
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
@@ -26,7 +26,7 @@ class ResultsDisplayFragment : Fragment(),IUpdateListener {
     ): View? {
 
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_second, container, false)
+        return inflater.inflate(R.layout.show_results_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
