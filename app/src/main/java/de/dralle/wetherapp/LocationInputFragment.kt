@@ -401,7 +401,7 @@ class LocationInputFragment : Fragment(), IUpdateListener {
     }
 
     private fun callByZipCode() {
-        var countryCode = getCountryCode()
+        var countryCode = getCountryCodeFromSettings()
         val zipCode = getZipCode()
         Log.d(tag, "Country code is $countryCode");
         Log.d(tag, "Zip code is $zipCode");
@@ -445,7 +445,7 @@ class LocationInputFragment : Fragment(), IUpdateListener {
                 Manifest.permission.INTERNET
             ) == PermissionChecker.PERMISSION_GRANTED
         ) {
-            var countryCode = getCountryCode()
+            var countryCode = getCountryCodeFromSettings()
             var cityName = getCityName()
             Log.d(tag, "Country code is $countryCode");
             Log.d(tag, "City name is $cityName");
@@ -585,7 +585,16 @@ class LocationInputFragment : Fragment(), IUpdateListener {
     /**
      * Get country code from UI
      */
+    @Deprecated("Country code is now a setting")
     private fun getCountryCode(): String {
         return view?.findViewById<TextView>(R.id.editTextCountryCode)?.text.toString();
+    }
+
+    /**
+     * Get country code from preferences.
+     */
+    private fun getCountryCodeFromSettings(): String {
+        val prefs=PreferenceManager.getDefaultSharedPreferences(context)
+        return prefs.getString("country_code","DE") ?: ""
     }
 }
