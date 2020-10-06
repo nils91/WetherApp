@@ -63,50 +63,6 @@
         app:layout_constraintTop_toBottomOf="@+id/btnSearchCity" />
 
     <Button
-        android:id="@+id/btnSearchGPS"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="10dp"
-        android:text="@string/search_by_gps"
-        app:layout_constraintStart_toEndOf="@+id/editTextLongitude"
-        app:layout_constraintTop_toBottomOf="@+id/btnLocate" />
-
-    <EditText
-        android:id="@+id/editTextLatitude"
-        android:layout_width="84dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="12dp"
-        android:ems="10"
-        android:hint="@string/lat_gps_input"
-        android:inputType="text|number"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextZip" />
-
-    <EditText
-        android:id="@+id/editTextLongitude"
-        android:layout_width="97dp"
-        android:layout_height="44dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="16dp"
-        android:ems="10"
-        android:hint="@string/lon_gps_input"
-        android:inputType="text|number"
-        app:layout_constraintStart_toEndOf="@+id/editTextLatitude"
-        app:layout_constraintTop_toBottomOf="@+id/editTextZip" />
-
-    <Button
-        android:id="@+id/btnLocate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="10dp"
-        android:text="@string/get_gps_coord"
-        app:layout_constraintStart_toEndOf="@+id/editTextLongitude"
-        app:layout_constraintTop_toBottomOf="@+id/btnSearchZip" />
-
-    <Button
         android:id="@+id/btnLocSeGPS"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

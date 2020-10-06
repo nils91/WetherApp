@@ -77,8 +77,6 @@ class LocationInputFragment : Fragment(), IUpdateListener {
 
         val btnCity = view.findViewById<Button>(R.id.btnSearchCity)
         val btnZip = view.findViewById<Button>(R.id.btnSearchZip)
-        val btnGPS = view.findViewById<Button>(R.id.btnSearchGPS)
-        val btnLocate = view.findViewById<Button>(R.id.btnLocate)
         val btnCurLoc = view.findViewById<Button>(R.id.btnLocSeGPS)
 
         btnCity?.setOnClickListener(
@@ -89,17 +87,6 @@ class LocationInputFragment : Fragment(), IUpdateListener {
             View.OnClickListener {
                 callByZipCode()
             })
-        btnGPS?.setOnClickListener(
-            View.OnClickListener {
-                callByGPS()
-            })
-        btnLocate?.setOnClickListener {
-            //locateAndWriteGPS()
-            //Send user to enable location services
-            val locationIntent =
-                Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-            startActivityForResult(locationIntent, LOCATION_INTENT_REQUEST_CODE)
-        }
         btnCurLoc?.setOnClickListener {
             //check permission for location
             handleCallAPIWithCurrentLocation()
@@ -166,51 +153,6 @@ class LocationInputFragment : Fragment(), IUpdateListener {
             }
         }
     }
-
-    private fun locateAndWriteGPS() {
-        if (ContextCompat.checkSelfPermission(
-                requireActivity(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PermissionChecker.PERMISSION_GRANTED
-        ) {
-            val locAvail: Task<LocationAvailability>? = fusedLocationProvider?.locationAvailability
-            locAvail?.addOnCompleteListener {
-                Log.d(tag, "Location availability: ${it.result}")
-            }
-            val locTask: Task<Location>? = fusedLocationProvider?.getCurrentLocation(
-                LocationRequest.PRIORITY_HIGH_ACCURACY,
-                null
-            )
-            locTask?.addOnCompleteListener(requireActivity(), OnCompleteListener {
-                Log.d(tag, "Location request completed")
-                val loc = it.result
-                if (loc != null) {
-                    Log.d(tag, "Latitude: ${loc.latitude} Longitude: ${loc.longitude}")
-                } else {
-                    Log.w(tag, "No exact location found")
-                }
-                if (loc != null) {
-                    activity?.runOnUiThread {
-                        writeLocationToUI(loc)
-                    }
-                }
-            })
-        } else {
-            if (shouldShowRequestPermissionRationale(
-                    android.Manifest.permission.ACCESS_FINE_LOCATION
-                )
-            ) {
-                val dialog = MessageDialogFragment()
-                if (fragmentManager != null) {
-                    dialog.show(requireFragmentManager(), tag)
-                } else {
-                    Log.w(tag, "Cant show dialog")
-                }
-            }
-            requestLocationPermission()
-        }
-    }
-
     /**
      * Request permission for fine location. Check onRequestPermissionsResult for result. Request code is PERMISSION_FINE_LOCATION_REQUEST_CODE
      */
@@ -220,13 +162,6 @@ class LocationInputFragment : Fragment(), IUpdateListener {
             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
             PERMISSION_FINE_LOCATION_REQUEST_CODE
         )
-    }
-
-    private fun writeLocationToUI(loc: Location) {
-        val etFieldLat = view?.findViewById<EditText>(R.id.editTextLatitude);
-        val etFieldLon = view?.findViewById<EditText>(R.id.editTextLongitude);
-        etFieldLat?.setText(loc.latitude.toString(), TextView.BufferType.EDITABLE)
-        etFieldLon?.setText(loc.longitude.toString(), TextView.BufferType.EDITABLE)
     }
 
     override fun onRequestPermissionsResult(
@@ -467,66 +402,6 @@ class LocationInputFragment : Fragment(), IUpdateListener {
         shared = container
     }
 
-    private fun callByGPS() {
-        if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.INTERNET
-            ) == PermissionChecker.PERMISSION_GRANTED
-        ) {
-            val lat = getLatitudeFromUI()
-            val lon = getLongitudeFromUI()
-            //Make sure the correct decimal point is used
-            lat?.replace(',', '.')
-            lon?.replace(',', '.')
-            Log.d(tag, "Latitude is $lat, longitude is $lon");
-            var urlString = resources.getString(R.string.api_call_gps)
-            Log.d(tag, "Loaded api url $urlString")
-            urlString = String.format(
-                urlString,
-                URLEncoder.encode(lat, "UTF-8"),
-                URLEncoder.encode(lon, "UTF-8")
-            )
-            var additonalParams = getParams()
-            var additionalParamsString = getParamString(additonalParams)
-            urlString += additionalParamsString
-            Log.i(tag, "Parameterized api url $urlString")
-            GlobalScope.launch {
-                var result: String? = null;
-                try {
-                    result = doApiCall(urlString)
-                } catch (e: Exception) {
-                    Log.e(tag, "API call failed ${e.message}")
-                    val message = "API call failed: ${e.message}"
-                    activity?.runOnUiThread {
-                        showLongToast(message)
-                    }
-
-                }
-                if (result != null) {
-                    val resultObject = JSONObject(result)
-                    shared?.apiResponseObject = resultObject
-
-                    activity?.runOnUiThread {
-                        navigateToResultFragment()
-                    }
-                }
-            }
-        } else {
-            Log.d(tag, "Internet access permission not granted")
-            Toast.makeText(activity, "No internet access permission", Toast.LENGTH_LONG).show()
-        }
-    }
-
-    private fun getLongitudeFromUI(): String? {
-        val etFieldLon = view?.findViewById<EditText>(R.id.editTextLongitude);
-        return etFieldLon?.text.toString()
-    }
-
-    private fun getLatitudeFromUI(): String? {
-        val etFieldLat = view?.findViewById<EditText>(R.id.editTextLatitude);
-        return etFieldLat?.text.toString()
-    }
-
     private fun callByZipCode() {
         var countryCode = getCountryCode()
         val zipCode = getZipCode()
@@ -614,6 +489,9 @@ class LocationInputFragment : Fragment(), IUpdateListener {
         }
     }
 
+    /**
+     * Trigger navigation flow to resultFragment
+     */
     private fun navigateToResultFragment() {
         findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
     }
