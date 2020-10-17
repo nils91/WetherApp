@@ -30,10 +30,12 @@
     <string name="units_pref">Preferred units</string>
 
     <string name="api_key_key">appid</string>
-    <string name="language_value">en</string>
     <string name="language_key">lang</string>
-    <string name="units_value">metric</string>
     <string name="units_key">units</string>
+
+    <!-- Default values. If there are set preference values, these will be ignored-->
+    <string name="language_value">en</string>
+    <string name="units_value">metric</string>
 
     <!-- API call urls-->
     <string name="api_call_city">http://api.openweathermap.org/data/2.5/weather?q=%1$s,%2$s</string>

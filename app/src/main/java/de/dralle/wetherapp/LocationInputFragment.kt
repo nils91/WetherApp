@@ -554,17 +554,23 @@ class LocationInputFragment : Fragment(), IUpdateListener {
      * Get additional parameters for openweatherapi
      */
     private fun getParams(): Map<String, String> {
-        var prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-        var params: MutableMap<String, String>
-        var apiKey = prefs.getString("api_key", null)
+        val prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+        val params: MutableMap<String, String>
+        val apiKey = prefs.getString("api_key", null)
+        val languageCode=prefs.getString("language_code",resources.getString(R.string.language_value))
+        val units=prefs.getString("units",resources.getString(R.string.units_value))
         Log.d(tag, "API key is $apiKey")
         params = HashMap<String, String>()
         if (apiKey != null) {
             params[resources.getString(R.string.api_key_key)] = apiKey
         }
-        params[resources.getString(R.string.language_key)] =
-            resources.getString(R.string.language_value)
-        params[resources.getString(R.string.units_key)] = resources.getString(R.string.units_value)
+        if(languageCode!=null){
+            params[resources.getString(R.string.language_key)] =
+                languageCode
+        }
+        if(units!=null){
+            params[resources.getString(R.string.units_key)] = units
+        }
         return params
     }
 
