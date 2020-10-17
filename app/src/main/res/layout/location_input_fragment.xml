@@ -7,28 +7,16 @@
     tools:context=".LocationInputFragment">
 
     <EditText
-        android:id="@+id/editTextCountryCode"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:ems="10"
-        android:hint="@string/country_code_input"
-        android:inputType="textPersonName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
         android:id="@+id/editTextCity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="16dp"
         android:ems="10"
         android:hint="@string/city_input"
         android:inputType="textPersonName"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextCountryCode" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/editTextZip"
@@ -46,30 +34,29 @@
         android:id="@+id/btnSearchCity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="12dp"
         android:text="@string/search_by_city"
         app:layout_constraintStart_toEndOf="@+id/editTextCity"
-        app:layout_constraintTop_toBottomOf="@+id/editTextCountryCode" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/btnSearchZip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="11dp"
-        android:layout_marginTop="11dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="8dp"
         android:text="@string/search_by_zip"
         app:layout_constraintStart_toEndOf="@+id/editTextZip"
-        app:layout_constraintTop_toBottomOf="@+id/btnSearchCity" />
+        app:layout_constraintTop_toBottomOf="@+id/editTextCity" />
 
     <Button
         android:id="@+id/btnLocSeGPS"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="124dp"
+        android:layout_marginTop="8dp"
         android:text="@string/get_cur_gps"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnSearchZip" />
 </androidx.constraintlayout.widget.ConstraintLayout>

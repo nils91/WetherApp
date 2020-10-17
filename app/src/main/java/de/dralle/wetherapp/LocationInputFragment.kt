@@ -589,14 +589,6 @@ class LocationInputFragment : Fragment(), IUpdateListener {
     }
 
     /**
-     * Get country code from UI
-     */
-    @Deprecated("Country code is now a setting")
-    private fun getCountryCode(): String {
-        return view?.findViewById<TextView>(R.id.editTextCountryCode)?.text.toString();
-    }
-
-    /**
      * Get country code from preferences.
      */
     private fun getCountryCodeFromSettings(): String {
